@@ -5,6 +5,7 @@ import preact from '@preact/preset-vite'
 export default defineConfig({
   plugins: [preact()],
   build: {
-    outDir: "../md-server/client"
+    outDir: "../md-server/client",
+    emptyOutDir: true
   }
 })

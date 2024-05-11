@@ -4,14 +4,19 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "vite --host 0.0.0.0",
     "build": "tsc && vite build",
     "preview": "vite preview",
     "add": "bun add",
     "remove": "bun remove"
   },
   "dependencies": {
-    "preact": "^10.19.6"
+    "@emotion/react": "^11.11.4",
+    "@emotion/styled": "^11.11.5",
+    "@mui/material": "^5.15.17",
+    "@types/react": "17",
+    "preact": "^10.19.6",
+    "sass": "^1.77.1"
   },
   "devDependencies": {
     "@preact/preset-vite": "^2.8.2",
