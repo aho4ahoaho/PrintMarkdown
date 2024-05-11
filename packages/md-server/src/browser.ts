@@ -1,6 +1,7 @@
-import { type PDFMargin, type PDFOptions } from "puppeteer";
+import type { PDFMargin, PDFOptions } from "puppeteer";
+import type Puppeteer from "puppeteer";
 //eslint-disable-next-line @typescript-eslint/no-var-requires
-const puppeteer = require("puppeteer"); //ESMでインポートするとバグる。https://github.com/oven-sh/bun/issues/4477
+const puppeteer: typeof Puppeteer = require("puppeteer"); //ESMでインポートするとバグる。https://github.com/oven-sh/bun/issues/4477
 
 const getBrowser = async () => {
     const browser = await puppeteer.launch({
