@@ -95,8 +95,14 @@
     font-family: 'Noto Sans Math', sans-serif;
   }
 </style>
+
+<!--テンプレートエンジン用-->
 <style>
-  <%- style %>
+  <% if (style) {
+    %><%- style %><%
+  }
+
+  %>
 </style>
 
 </html>
