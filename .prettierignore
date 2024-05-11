@@ -1,0 +1,7 @@
+node_modules/
+client/
+tmp/
+dist/
+test/*
+!test/test.ts
+!test/*.md
