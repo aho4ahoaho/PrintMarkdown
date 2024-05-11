@@ -8,5 +8,5 @@ export const API_URL = (() => {
     }
 
     //PROD
-    return `${location.protocol}//${location.hostname}`;
+    return `${location.protocol}//${location.host}`;
 })();

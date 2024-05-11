@@ -21,8 +21,12 @@
         "packages/*"
     ],
     "lint-staged": {
-        "*.{ts,tsx,js,jsx,mjs,cjs}": [
-            "eslint --fix",
+        "packages/md-client/**/*.{ts,tsx,js,jsx,mjs,cjs}": [
+            "bun client eslint --fix",
+            "prettier --write"
+        ],
+        "packages/md-server/**/*.{ts,tsx,js,jsx,mjs,cjs}": [
+            "bun server eslint --fix",
             "prettier --write"
         ],
         "*.{json,md,css,scss,ejs,html}": [
