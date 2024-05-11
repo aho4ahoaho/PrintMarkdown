@@ -1,4 +1,5 @@
-import puppeteer, { type PDFMargin, type PDFOptions } from "puppeteer";
+import { type PDFMargin, type PDFOptions } from "puppeteer";
+const puppeteer = require("puppeteer"); //ESMでインポートするとバグる。https://github.com/oven-sh/bun/issues/4477
 
 
 const getBrowser = async () => {
@@ -14,7 +15,7 @@ const getBrowser = async () => {
         ],
         dumpio: false
     });
-    console.log("Browser started");
+    console.debug("Browser started");
     return browser;
 };
 /**

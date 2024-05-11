@@ -10,7 +10,7 @@
   "scripts": {
     "start": "bun run index.ts",
     "dev": "bun --hot run index.ts",
-    "build": "bun build index.ts --outdir dist",
+    "build": "bun build index.ts --outdir dist --target node",
     "add": "bun add",
     "remove": "bun remove",
     "test": "bun run test/test.ts"
