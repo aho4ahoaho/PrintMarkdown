@@ -29,7 +29,7 @@
             "bun server eslint --fix",
             "prettier --write"
         ],
-        "*.{json,md,css,scss,ejs,html}": [
+        "*.{json,md,css,scss,ejs,html,ts}": [
             "prettier --write"
         ]
     }
