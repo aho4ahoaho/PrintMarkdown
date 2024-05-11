@@ -2,49 +2,69 @@
 <html lang="ja">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <!-- https://fonts.google.com/share?selection.family=Noto+Color+Emoji|Noto+Sans+JP:wght@100..900|Noto+Sans+Math|Noto+Sans:ital,wght@0,100..900;1,100..900|Noto+Serif+JP|Noto+Serif:ital,wght@0,100..900;1,100..900|Roboto+Mono:ital,wght@0,100..700;1,100..700|Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900 -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Noto+Color+Emoji&family=Noto+Sans+JP:wght@100..900&family=Noto+Sans+Math&family=Noto+Sans:ital,wght@0,100..900;1,100..900&family=Noto+Serif+JP&family=Noto+Serif:ital,wght@0,100..900;1,100..900&family=Roboto+Mono:ital,wght@0,100..700;1,100..700&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap"
-        rel="stylesheet">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <!-- https://fonts.google.com/share?selection.family=Noto+Color+Emoji|Noto+Sans+JP:wght@100..900|Noto+Sans+Math|Noto+Sans:ital,wght@0,100..900;1,100..900|Noto+Serif+JP|Noto+Serif:ital,wght@0,100..900;1,100..900|Roboto+Mono:ital,wght@0,100..700;1,100..700|Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900 -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Noto+Color+Emoji&family=Noto+Sans+JP:wght@100..900&family=Noto+Sans+Math&family=Noto+Sans:ital,wght@0,100..900;1,100..900&family=Noto+Serif+JP&family=Noto+Serif:ital,wght@0,100..900;1,100..900&family=Roboto+Mono:ital,wght@0,100..700;1,100..700&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap"
+    rel="stylesheet">
 </head>
 
 <body>
-    <%- document %>
+  <%- document %>
 </body>
+<!-- MathJax -->
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [
+        ['$', '$'],
+        ['\\(', '\\)']
+      ],
+      displayMath: [
+        ['$$', '$$'],
+        ['\\[', '\\]']
+      ]
+    }
+  };
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js">
+</script>
 <style>
-    body {
-        font-family: 'Noto Serif', 'Noto Serif JP', serif;
-        word-break: auto-phrase;
-    }
+  body {
+    font-family: 'Noto Serif', 'Noto Serif JP', serif;
+    word-break: auto-phrase;
+  }
 
-    h1,
-    h2,
-    h3,
-    h4,
-    h5,
-    h6 {
-        font-family: 'Noto Sans', 'Noto Sans JP', sans-serif;
-    }
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: 'Noto Sans', 'Noto Sans JP', sans-serif;
+  }
 
-    pre,
-    code {
-        font-family: 'Roboto Mono', monospace;
-    }
+  pre,
+  code {
+    font-family: 'Roboto Mono', monospace;
+  }
 
-    .emoji {
-        font-family: 'Noto Color Emoji', sans-serif;
-    }
+  .emoji {
+    font-family: 'Noto Color Emoji', sans-serif;
+  }
 
-    .math {
-        font-family: 'Noto Sans Math', sans-serif;
-    }
+  .math {
+    font-family: 'Noto Sans Math', sans-serif;
+  }
+</style>
+<style>
+  <%- style %>
 </style>
 
 </html>

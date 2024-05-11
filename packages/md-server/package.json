@@ -12,7 +12,8 @@
     "dev": "bun --hot run index.ts",
     "build": "bun build index.ts --outdir dist",
     "add": "bun add",
-    "remove": "bun remove"
+    "remove": "bun remove",
+    "test": "bun run test/test.ts"
   },
   "type": "module",
   "dependencies": {
@@ -23,6 +24,7 @@
     "@types/multer": "^1.4.11",
     "ejs": "^3.1.10",
     "express": "^4.19.2",
+    "highlight.js": "^11.9.0",
     "markdown-it": "^14.1.0",
     "markdown-it-checkbox": "^1.1.0",
     "markdown-it-container": "^4.0.0",

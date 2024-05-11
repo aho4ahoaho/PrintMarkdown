@@ -1,12 +1,29 @@
 import markdownit from 'markdown-it'
-import { markdownPlugins } from './plugin'
+import hljs from 'highlight.js';
 
+//型の怪しいプラグインを読み込む
+import { markdownitsub, markdownitsup, markdownitcheckbox, markdownitcontainer, markdownitfootnote } from './plugin'
+import type MarkdownIt from 'markdown-it/index.js';
 
-const md = markdownit()
-//プラグインを適用
-markdownPlugins.forEach(plugin => {
-    md.use(plugin)
+//any型を避けるために型を指定
+const md: MarkdownIt = markdownit({
+    highlight: (str, lang) => {
+        if (lang && hljs.getLanguage(lang)) {
+            try {
+                return '<pre><code class="hljs">' +
+                    hljs.highlight(str, { language: lang, ignoreIllegals: true }).value +
+                    '</code></pre>';
+            } catch (__) { }
+        }
+
+        return '<pre><code class="hljs">' + md.utils.escapeHtml(str) + '</code></pre>';
+    }
 })
+//プラグインを適用
+md.use(markdownitsub).use(markdownitsup).use(markdownitcheckbox).use(markdownitfootnote)
+
+//コンテナプラグインを適用
+md.use(markdownitcontainer, "info").use(markdownitcontainer, "warn").use(markdownitcontainer, "alert")
 
 export const convertMarkdownToHTML = async (markdown: string) => {
     return md.render(markdown)
