@@ -1,4 +1,5 @@
 import { type PDFMargin, type PDFOptions } from "puppeteer";
+//eslint-disable-next-line @typescript-eslint/no-var-requires
 const puppeteer = require("puppeteer"); //ESMでインポートするとバグる。https://github.com/oven-sh/bun/issues/4477
 
 

@@ -1,3 +1,4 @@
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 //@ts-expect-error
 import style from 'highlight.js/styles/github.css';
 import fs from "fs/promises"
