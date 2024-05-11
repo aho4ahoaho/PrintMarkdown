@@ -12,14 +12,23 @@ export function App() {
     if (!file) {
       return
     }
-    console.log(API_URL)
     const formData = new FormData()
     formData.append("file", file)
     const res = await fetch(`${API_URL}/api/convert`, {
       method: "POST",
       body: formData
     })
-    console.log(res)
+    if (!res.ok) {
+      console.error(res.statusText)
+      return
+    }
+    const blob = await res.blob()
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement("a")
+    a.setAttribute("href", url)
+    const fileName = file.name.replace(/\.md$/, ".pdf")
+    a.setAttribute("download", fileName)
+    a.click()
   }, [file])
 
   return (
