@@ -2,6 +2,11 @@ import Express from "express";
 import path from "path";
 const app = Express();
 
+//アクセスを表示する
+app.use((req, res, next) => {
+    console.log(`${req.method} ${req.url} ${req.ip}`);
+    next();
+})
 
 //クライアントのファイルを配信する
 app.use(Express.static(path.join(__dirname, "client")))
