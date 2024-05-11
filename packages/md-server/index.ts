@@ -1,8 +1,8 @@
 import Express from "express";
 import path from "path";
 import multer, { type Options } from "multer";
-import { randomUUID } from "crypto"
-import fs from "fs"
+import { randomUUID } from "crypto";
+import fs from "fs";
 import { convertMarkdownToPdf } from "./src/convert";
 
 const app = Express();
@@ -16,22 +16,22 @@ const storage = multer.diskStorage({
         const ext = path.extname(file.originalname);
         const name = randomUUID();
         cb(null, `${name}${ext}`);
-    }
+    },
 });
 
 const limits: Options["limits"] = {
-    fileSize: 1024 * 1024 * 20 //20MB
-}
+    fileSize: 1024 * 1024 * 20, //20MB
+};
 
 //アクセスを表示する
 app.use((req, res, next) => {
     console.log(`${req.method} ${req.url} ${req.ip}`);
     res.setHeader("Access-Control-Allow-Origin", "*");
     next();
-})
+});
 
 //クライアントのファイルを配信する
-app.use(Express.static(path.join(__dirname, "client")))
+app.use(Express.static(path.join(__dirname, "client")));
 
 //JSONをパース出来るようにする
 app.use(Express.json());

@@ -2,10 +2,10 @@
 
 ### インライン
 
-- `inline code`
-- `print([*array])`
-- `console.log(location)`
-- `fmt.println("Hello, World!")`
+-   `inline code`
+-   `print([*array])`
+-   `console.log(location)`
+-   `fmt.println("Hello, World!")`
 
 ## ブロック
 
@@ -26,8 +26,8 @@ sudo apt-get update
 
 ```javascript
 window.onload = () => {
-  console.log("Onload!");
-  document.getElementById("app").innerHTML = "Hello, World!";
+    console.log("Onload!");
+    document.getElementById("app").innerHTML = "Hello, World!";
 };
 ```
 
@@ -36,22 +36,22 @@ window.onload = () => {
 ```typescript
 import Express from "express";
 type User = {
-  name: string;
-  age: number;
+    name: string;
+    age: number;
 };
 
 const users: User[] = [
-  { name: "Alice", age: 20 },
-  { name: "Bob", age: 30 },
+    { name: "Alice", age: 20 },
+    { name: "Bob", age: 30 },
 ];
 
 const app = Express();
 app.get("/users", (req, res) => {
-  res.json(users);
+    res.json(users);
 });
 
 app.listen(3000, () => {
-  console.log("Server started!");
+    console.log("Server started!");
 });
 ```
 
@@ -61,13 +61,13 @@ app.listen(3000, () => {
 import React from "react";
 
 const App = () => {
-  const [count, setCount] = React.useState(0);
-  return (
-    <div>
-      <p>{count}</p>
-      <button onClick={() => setCount(count + 1)}>Increment</button>
-    </div>
-  );
+    const [count, setCount] = React.useState(0);
+    return (
+        <div>
+            <p>{count}</p>
+            <button onClick={() => setCount(count + 1)}>Increment</button>
+        </div>
+    );
 };
 ```
 
