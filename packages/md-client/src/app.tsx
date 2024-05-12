@@ -5,9 +5,14 @@ import styled from "@emotion/styled";
 import { CloudUpload } from "@mui/icons-material";
 import { useCallback, useState } from "preact/hooks";
 import { API_URL } from "./utils/url";
+import { Header } from "./components/Header";
+import { ErrorModal } from "./components/Modal/error";
 
 export function App() {
     const [file, setFile] = useState<File | null>(null);
+    const [errorText, setErrorText] = useState<string | null>(null);
+    const [, setPdfUrl] = useState<string | null>(null);
+
     const uploadProcess = useCallback(async () => {
         if (!file) {
             return;
@@ -24,6 +29,7 @@ export function App() {
         }
         const blob = await res.blob();
         const url = URL.createObjectURL(blob);
+        setPdfUrl(url);
         const a = document.createElement("a");
         a.setAttribute("href", url);
         const fileName = file.name.replace(/\.md$/, ".pdf");
@@ -32,28 +38,43 @@ export function App() {
     }, [file]);
 
     return (
-        <Box>
-            <Text>{file ? file.name : "Not Specified"}</Text>
-            <Button
-                component="label"
-                role={undefined}
-                variant="contained"
-                tabIndex={-1}
-                startIcon={<CloudUpload />}
-            >
-                Upload file
-                <VisuallyHiddenInput
-                    type="file"
-                    onChange={(e) => {
-                        const file = e.target.files?.item(0);
-                        if (file) {
-                            setFile(file);
-                        }
+        <>
+            <Header />
+            <Box display="flex" flexDirection="column" width="min(100%,800px)" margin="0 auto">
+                <Text>{file ? file.name : "Not Specified"}</Text>
+                <Button
+                    component="label"
+                    role={undefined}
+                    variant="contained"
+                    tabIndex={-1}
+                    startIcon={<CloudUpload />}
+                >
+                    Select file
+                    <VisuallyHiddenInput
+                        type="file"
+                        onChange={(e) => {
+                            const file = e.target.files?.item(0);
+                            if (file?.name.endsWith(".md")) {
+                                setFile(file);
+                            } else {
+                                setErrorText("マークダウンファイルを選択してください。");
+                            }
+                        }}
+                    />
+                </Button>
+                <Button onClick={uploadProcess}>Upload</Button>
+            </Box>
+            {errorText && (
+                <ErrorModal
+                    title="エラー"
+                    onPositiveClick={() => {
+                        setErrorText(null);
                     }}
-                />
-            </Button>
-            <Button onClick={uploadProcess}>Upload</Button>
-        </Box>
+                >
+                    {errorText}
+                </ErrorModal>
+            )}
+        </>
     );
 }
 
