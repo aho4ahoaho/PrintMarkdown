@@ -7,7 +7,8 @@
         "server": "bun --cwd packages/md-server",
         "build": "bun client build && bun server build",
         "start": "bun run packages/md-server/dist/index.js",
-        "clean": "rm -rf node_modules && rm -rf packages/**/node_modules"
+        "clean": "rm -rf node_modules && rm -rf packages/**/node_modules",
+        "prepare": "husky install"
     },
     "devDependencies": {
         "@types/bun": "latest",
