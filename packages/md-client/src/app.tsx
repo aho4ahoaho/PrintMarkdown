@@ -62,10 +62,13 @@ export function App() {
             <Box
                 display="flex"
                 flexDirection="column"
+                alignItems="center"
                 width="min(100%,800px)"
                 margin="0 auto 1rem auto"
+                padding="0 1rem"
+                boxSizing="border-box"
             >
-                <PDFViewer src={pdfurl ?? undefined} />
+                <ThePDFViewer src={pdfurl} />
                 <LoadingButton
                     component="label"
                     role={undefined}
@@ -73,6 +76,7 @@ export function App() {
                     tabIndex={-1}
                     startIcon={<CloudUpload />}
                     loading={isConverting}
+                    fullWidth
                 >
                     {file?.name || "Select file"}
                     <VisuallyHiddenInput
@@ -89,7 +93,7 @@ export function App() {
                         }}
                     />
                 </LoadingButton>
-                <Button disabled={!pdfurl} onClick={onDownload} startIcon={<Download />}>
+                <Button disabled={!pdfurl} onClick={onDownload} startIcon={<Download />} fullWidth>
                     Download
                 </Button>
             </Box>
@@ -116,4 +120,10 @@ const VisuallyHiddenInput = styled.input({
     left: 0,
     whiteSpace: "nowrap",
     width: 1,
+});
+
+const ThePDFViewer = styled(PDFViewer)(() => {
+    return {
+        width: "calc(75lvh / 297 * 210)",
+    };
 });

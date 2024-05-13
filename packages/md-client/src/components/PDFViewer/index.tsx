@@ -7,10 +7,11 @@ import pdfjsWorker from "pdfjs-dist/build/pdf.worker?url";
 import styled from "@emotion/styled";
 
 type PDFViewerProps = {
-    src?: string;
+    src?: string | null;
     scale?: number;
+    className?: string;
 };
-export const PDFViewer = ({ src, scale = 1.0 }: PDFViewerProps) => {
+export const PDFViewer = ({ src, scale = 1.0, className }: PDFViewerProps) => {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const [pdf, setPdf] = useState<PDFDocumentProxy | null>(null);
     const [page, setPage] = useState<number>(1);
@@ -79,7 +80,7 @@ export const PDFViewer = ({ src, scale = 1.0 }: PDFViewerProps) => {
     );
 
     return (
-        <PDFViewerContainer>
+        <PDFViewerContainer className={className}>
             <PDFViewerCanvas ref={canvasRef} />
             <ButtonGroup>
                 <Button
