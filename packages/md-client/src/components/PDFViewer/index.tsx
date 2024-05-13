@@ -47,8 +47,8 @@ export const PDFViewer = ({
         if (!isDoublePage) return;
         const canvas2 = secondCanvasRef.current;
         if (!canvas2) return;
-        canvas2.width = canvas2?.clientWidth;
-        canvas2.height = (canvas2?.clientWidth / 210) * 297;
+        canvas2.width = canvas.width;
+        canvas2.height = canvas.height;
     }, [isDoublePage]);
 
     const renderPage = useCallback(
