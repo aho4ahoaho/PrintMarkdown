@@ -8,8 +8,10 @@ import { API_URL } from "./utils/url";
 import { Header } from "./components/Header";
 import { ErrorModal } from "./components/Modal/error";
 import { PDFViewer } from "./components/PDFViewer";
-import { useEffect } from "react";
 import { useOnResize } from "./utils/resize";
+import { DirectoryInput } from "./components/DirectoryInput";
+
+const IMAGE_EXTENSIONS = ["jpg", "jpeg", "png", "gif", "bmp", "webp", "svg"];
 
 export function App() {
     const [file, setFile] = useState<File | null>(null);
@@ -22,33 +24,47 @@ export function App() {
         return window.innerWidth > docsWidth * 2;
     }, []);
 
-    useEffect(() => {
-        if (!file) {
-            return;
-        }
-        setIsConverting(true);
-        (async () => {
-            const formData = new FormData();
-            formData.append("file", file);
-            const res = await fetch(`${API_URL}/api/convert`, {
-                method: "POST",
-                body: formData,
-            });
-            if (!res.ok) {
-                console.error(res.statusText);
+    const onSelectFile = useCallback(
+        (files: File[]) => {
+            const imageFiles = files.filter((file) =>
+                IMAGE_EXTENSIONS.some((ext) => file.name.endsWith(`.${ext}`))
+            );
+            const docFile =
+                files.find((file) => file.name === "index.md") ??
+                files.find((file) => file.name.endsWith(".md"));
+            if (!docFile) {
+                setErrorText("index.md または .md ファイルが見つかりません");
                 return;
             }
-            const blob = await res.blob();
-            const url = URL.createObjectURL(blob);
-            setPdfUrl(url);
-            setIsConverting(false);
-        })();
-        return () => {
-            if (pdfurl) {
-                URL.revokeObjectURL(pdfurl);
-            }
-        };
-    }, [file]);
+            setFile(docFile);
+            setIsConverting(true);
+            (async () => {
+                const formData = new FormData();
+                formData.append("file", docFile);
+                imageFiles.forEach((file) => {
+                    formData.append("images", file);
+                });
+                const res = await fetch(`${API_URL}/api/convert`, {
+                    method: "POST",
+                    body: formData,
+                });
+                if (!res.ok) {
+                    console.error(res.statusText);
+                    return;
+                }
+                const blob = await res.blob();
+                const url = URL.createObjectURL(blob);
+                setPdfUrl(url);
+                setIsConverting(false);
+            })();
+            return () => {
+                if (pdfurl) {
+                    URL.revokeObjectURL(pdfurl);
+                }
+            };
+        },
+        [file]
+    );
 
     const onDownload = useCallback(() => {
         if (!pdfurl) {
@@ -98,15 +114,12 @@ export function App() {
                     <VisuallyHiddenInput
                         type="file"
                         onChange={(e) => {
-                            const file = e.target.files?.item(0);
-                            if (!file) {
-                                return;
-                            } else if (file?.name.endsWith(".md")) {
-                                setFile(file);
-                            } else {
-                                setErrorText("マークダウンファイルを選択してください。");
+                            const files = e.currentTarget.files;
+                            if (files?.length) {
+                                onSelectFile(Array.from(files));
                             }
                         }}
+                        webkitdirectory={true}
                     />
                 </LoadingButton>
                 <Button disabled={!pdfurl} onClick={onDownload} startIcon={<Download />} fullWidth>
@@ -127,7 +140,7 @@ export function App() {
     );
 }
 
-const VisuallyHiddenInput = styled.input({
+const VisuallyHiddenInput = styled(DirectoryInput)({
     clip: "rect(0 0 0 0)",
     height: 1,
     overflow: "hidden",
