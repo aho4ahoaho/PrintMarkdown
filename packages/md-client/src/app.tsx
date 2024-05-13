@@ -9,12 +9,18 @@ import { Header } from "./components/Header";
 import { ErrorModal } from "./components/Modal/error";
 import { PDFViewer } from "./components/PDFViewer";
 import { useEffect } from "react";
+import { useOnResize } from "./utils/resize";
 
 export function App() {
     const [file, setFile] = useState<File | null>(null);
     const [isConverting, setIsConverting] = useState<boolean>(false);
     const [errorText, setErrorText] = useState<string | null>(null);
     const [pdfurl, setPdfUrl] = useState<string | null>(null);
+
+    const isDoublePage = useOnResize(() => {
+        const docsWidth = (window.innerHeight / 297) * 210;
+        return window.innerWidth > docsWidth * 2;
+    }, []);
 
     useEffect(() => {
         if (!file) {
@@ -63,12 +69,22 @@ export function App() {
                 display="flex"
                 flexDirection="column"
                 alignItems="center"
+                width={isDoublePage ? "min(100%,1600px)" : "min(100%,800px)"}
+                margin="0 auto 1rem auto"
+                padding="0 1rem"
+                boxSizing="border-box"
+            >
+                <ThePDFViewer src={pdfurl} isDoublePage={isDoublePage} />
+            </Box>
+            <Box
+                display="flex"
+                flexDirection="column"
+                alignItems="center"
                 width="min(100%,800px)"
                 margin="0 auto 1rem auto"
                 padding="0 1rem"
                 boxSizing="border-box"
             >
-                <ThePDFViewer src={pdfurl} />
                 <LoadingButton
                     component="label"
                     role={undefined}
@@ -122,8 +138,8 @@ const VisuallyHiddenInput = styled.input({
     width: 1,
 });
 
-const ThePDFViewer = styled(PDFViewer)(() => {
+const ThePDFViewer = styled(PDFViewer)(({ isDoublePage }) => {
     return {
-        width: "calc(75lvh / 297 * 210)",
+        width: isDoublePage ? "calc(75lvh / 297 * 210 * 2)" : "calc(75lvh / 297 * 210)",
     };
 });

@@ -10,9 +10,16 @@ type PDFViewerProps = {
     src?: string | null;
     scale?: number;
     className?: string;
+    isDoublePage?: boolean;
 };
-export const PDFViewer = ({ src, scale = 1.0, className }: PDFViewerProps) => {
+export const PDFViewer = ({
+    src,
+    scale = 1.0,
+    className,
+    isDoublePage = false,
+}: PDFViewerProps) => {
     const canvasRef = useRef<HTMLCanvasElement>(null);
+    const secondCanvasRef = useRef<HTMLCanvasElement>(null);
     const [pdf, setPdf] = useState<PDFDocumentProxy | null>(null);
     const [page, setPage] = useState<number>(1);
 
@@ -36,15 +43,28 @@ export const PDFViewer = ({ src, scale = 1.0, className }: PDFViewerProps) => {
         if (!canvas) return;
         canvas.width = canvas?.clientWidth;
         canvas.height = (canvas?.clientWidth / 210) * 297;
-    }, []);
 
-    useEffect(() => {
-        const canvas = canvasRef.current;
-        const ctx = canvas?.getContext("2d");
+        if (!isDoublePage) return;
+        const canvas2 = secondCanvasRef.current;
+        if (!canvas2) return;
+        canvas2.width = canvas2?.clientWidth;
+        canvas2.height = (canvas2?.clientWidth / 210) * 297;
+    }, [isDoublePage]);
 
-        if (!(pdf && canvas && ctx)) return;
+    const renderPage = useCallback(
+        async (canvas: HTMLCanvasElement | null, page: number) => {
+            //変数の用意
+            const ctx = canvas?.getContext("2d");
+            if (!ctx || !pdf || !canvas) return;
 
-        (async () => {
+            //ページが存在しない場合は白紙を表示
+            if (page > pdf.numPages) {
+                ctx.fillStyle = "white";
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                return;
+            }
+
+            //レンダリング処理
             const pageData = await pdf?.getPage(page);
 
             const docWidth = pageData?.view[2];
@@ -53,11 +73,19 @@ export const PDFViewer = ({ src, scale = 1.0, className }: PDFViewerProps) => {
             const viewport = pageData?.getViewport({ scale: scale * docScale });
             canvas.width = viewport.width;
             canvas.height = viewport.height;
-            await pageData?.render({
+            pageData?.render({
                 canvasContext: ctx,
                 viewport,
             }).promise;
-        })();
+        },
+        [pdf, page, scale]
+    );
+
+    useEffect(() => {
+        renderPage(canvasRef.current, page);
+        if (isDoublePage) {
+            renderPage(secondCanvasRef.current, page + 1);
+        }
     }, [pdf, page]);
 
     const pageUpdate = useCallback(
@@ -81,7 +109,10 @@ export const PDFViewer = ({ src, scale = 1.0, className }: PDFViewerProps) => {
 
     return (
         <PDFViewerContainer className={className}>
-            <PDFViewerCanvas ref={canvasRef} />
+            <CanvasGroup>
+                <PDFViewerCanvas ref={canvasRef} />
+                {isDoublePage && <PDFViewerCanvas ref={secondCanvasRef} />}
+            </CanvasGroup>
             <ButtonGroup>
                 <Button
                     variant="contained"
@@ -114,11 +145,20 @@ const PDFViewerContainer = styled.div({
     padding: "1rem",
 });
 
+const CanvasGroup = styled.div({
+    display: "flex",
+    gap: "1rem",
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+});
+
 const PDFViewerCanvas = styled.canvas(({ hidden }: { hidden?: boolean }) => ({
     display: hidden ? "none" : "block",
     width: "100%",
     height: "auto",
     boxShadow: "0 0 5px 0 rgba(0, 0, 0, 0.5)",
+    flex: 1,
 }));
 
 const ButtonGroup = styled.div({
