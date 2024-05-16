@@ -23,10 +23,6 @@ export default defineConfig({
     build: {
         outDir: "../md-server/client",
         emptyOutDir: true,
-    },
-    optimizeDeps: {
-        esbuildOptions: {
-            target: ["es2022", "firefox125", "chrome124"],
-        },
+        target: "es2022",
     },
 });
