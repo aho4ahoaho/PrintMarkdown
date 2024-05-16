@@ -2,7 +2,7 @@ import { Box, Button } from "@mui/material";
 import "./app.css";
 import { LoadingButton } from "@mui/lab";
 import styled from "@emotion/styled";
-import { CloudUpload, Download } from "@mui/icons-material";
+import { CloudUpload, Download, DriveFolderUpload } from "@mui/icons-material";
 import { useCallback, useState } from "preact/hooks";
 import { Header } from "./components/Header";
 import { ErrorModal } from "./components/Modal/error";
@@ -11,6 +11,7 @@ import { useOnResize } from "./utils/resize";
 import { DirectoryInput } from "./components/DirectoryInput";
 import { fileUploadProcess } from "./utils/upload";
 import { convertProcess } from "./utils/convert";
+import { TargetedEvent } from "preact/compat";
 
 export function App() {
     const [file, setFile] = useState<string | null>(null);
@@ -22,6 +23,14 @@ export function App() {
         const docsWidth = (window.innerHeight / 297) * 210;
         return window.innerWidth > docsWidth * 2;
     }, []);
+
+    const onInputChange = async (e: TargetedEvent<HTMLInputElement, Event>) => {
+        const files = e.currentTarget.files;
+        if (files?.length) {
+            onSelectDirectory(Array.from(files));
+            e.currentTarget.value = "";
+        }
+    };
 
     const onSelectDirectory = async (files: File[]) => {
         if (pdfUrl) {
@@ -75,29 +84,40 @@ export function App() {
                 padding="0 1rem"
                 boxSizing="border-box"
             >
-                <LoadingButton
-                    component="label"
-                    role={undefined}
-                    variant="contained"
-                    tabIndex={-1}
-                    startIcon={<CloudUpload />}
-                    loading={isConverting}
-                    fullWidth
-                >
-                    Select Directory
-                    <VisuallyHiddenInput
-                        type="file"
-                        onChange={(e) => {
-                            const files = e.currentTarget.files;
-                            if (files?.length) {
-                                onSelectDirectory(Array.from(files));
-                                e.currentTarget.value = "";
-                            }
-                        }}
-                        directory={true}
-                    />
-                </LoadingButton>
-
+                <ButtonGroupWrapper>
+                    <LoadingButton
+                        component="label"
+                        role={undefined}
+                        variant="contained"
+                        tabIndex={-1}
+                        startIcon={<CloudUpload />}
+                        loading={isConverting}
+                    >
+                        Select File
+                        <VisuallyHiddenInput
+                            type="file"
+                            onChange={onInputChange}
+                            directory={false}
+                            accept={".md"}
+                        />
+                    </LoadingButton>
+                    <LoadingButton
+                        component="label"
+                        role={undefined}
+                        variant="contained"
+                        tabIndex={-1}
+                        startIcon={<DriveFolderUpload />}
+                        loading={isConverting}
+                        color="secondary"
+                    >
+                        Select Folder
+                        <VisuallyHiddenInput
+                            type="file"
+                            onChange={onInputChange}
+                            directory={true}
+                        />
+                    </LoadingButton>
+                </ButtonGroupWrapper>
                 <Button disabled={!pdfUrl} onClick={onDownload} startIcon={<Download />} fullWidth>
                     Download
                 </Button>
@@ -115,6 +135,17 @@ export function App() {
         </>
     );
 }
+
+const ButtonGroupWrapper = styled.div({
+    display: "flex",
+    flexDirection: "row",
+    gap: "1rem",
+    width: "100%",
+    maxWidth: "600px",
+    "> *": {
+        flex: 1,
+    },
+});
 
 const VisuallyHiddenInput = styled(DirectoryInput)({
     clip: "rect(0 0 0 0)",
