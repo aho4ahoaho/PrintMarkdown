@@ -24,7 +24,7 @@ export const convertMarkdownToPdf = async (filePath: string, images: ImageData[]
     const document = await convertMarkdownToHTML(markdown);
     const replacedDocument = await replaceHTMLImage(document, images);
     const result = await template({ document: replacedDocument, style: hljsStyle });
-    await fs.writeFile(path.join(rootDir, "tmp", `${filename}.html`), result);
+    //await fs.writeFile(path.join(rootDir, "tmp", `${filename}.html`), result);
     const pdfBuffer = await renderingHTML(result);
     const pdfPath = path.join(rootDir, "tmp", `${filename}.pdf`);
     await fs.writeFile(pdfPath, pdfBuffer);

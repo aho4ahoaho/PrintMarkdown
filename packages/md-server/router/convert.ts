@@ -1,6 +1,6 @@
 import Express from "express";
 import multer, { type Options } from "multer";
-import fs from "fs";
+import fs from "fs/promises";
 import path from "path";
 import { convertMarkdownToPdf } from "../src/convert";
 import { randomUUID } from "crypto";
@@ -8,7 +8,12 @@ import { rootDir } from "../src/util";
 
 const router = Express.Router();
 
-fs.mkdirSync(path.join(rootDir, "tmp"), { recursive: true });
+await fs.mkdir(path.join(rootDir, "tmp"), { recursive: true });
+fs.readdir(path.join(rootDir, "tmp")).then((files) =>
+    files.forEach((file) => {
+        fs.unlink(path.join(rootDir, "tmp", file));
+    })
+);
 
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
@@ -69,7 +74,7 @@ router.post(
             return;
         }
         if (path.extname(docFile.filename) !== ".md") {
-            fs.unlinkSync(docFile.path);
+            fs.unlink(docFile.path);
             res.status(400).json({ message: "Not markdown file" });
         }
         res.send({
@@ -79,6 +84,13 @@ router.post(
                 fileName: image.filename,
             })),
         });
+
+        setTimeout(async () => {
+            (await fs.exists(docFile.path)) && fs.unlink(docFile.path);
+            images?.forEach(
+                async (image) => (await fs.exists(docFile.path)) && fs.unlink(image.path)
+            );
+        }, 1000 * 10);
     }
 );
 
@@ -118,7 +130,11 @@ router.post("/convert", async (req, res) => {
     })();
     const docPath = path.join(rootDir, "tmp", docFile);
     const pdfPath = await convertMarkdownToPdf(docPath, images);
-    res.sendFile(pdfPath);
+    res.sendFile(pdfPath, () => {
+        fs.unlink(docPath);
+        images.forEach((image) => fs.unlink(path.join(rootDir, "tmp", image.fileName)));
+        fs.unlink(pdfPath);
+    });
 });
 
 export { router };
