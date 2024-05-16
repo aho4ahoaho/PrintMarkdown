@@ -13,6 +13,7 @@ export const TheHeader = styled.header({
     color: "white",
     padding: "0.5rem 1rem",
     width: "100%",
+    boxSizing: "border-box",
 });
 
 export const HeaderTitle = styled.h1({
