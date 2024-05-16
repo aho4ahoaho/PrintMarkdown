@@ -161,5 +161,6 @@ const VisuallyHiddenInput = styled(DirectoryInput)({
 const ThePDFViewer = styled(PDFViewer)(({ isDoublePage }) => {
     return {
         width: isDoublePage ? "calc(75lvh / 297 * 210 * 2)" : "calc(75lvh / 297 * 210)",
+        maxWidth: "100%",
     };
 });
