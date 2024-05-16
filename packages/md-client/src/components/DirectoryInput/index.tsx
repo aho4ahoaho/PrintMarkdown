@@ -4,11 +4,11 @@ import React, { useEffect } from "react";
 
 type DirectoryInputProps = HTMLAttributes<HTMLInputElement> & {
     ref?: React.RefObject<HTMLInputElement> | React.MutableRefObject<HTMLInputElement>;
-    webkitdirectory: boolean;
+    directory: boolean;
 };
 export const DirectoryInput = ({
     children,
-    webkitdirectory,
+    directory,
     ref: propRef,
     ...props
 }: DirectoryInputProps) => {
@@ -17,12 +17,14 @@ export const DirectoryInput = ({
     useEffect(() => {
         const input = propRef?.current ?? ref.current;
 
-        if (webkitdirectory) {
+        if (directory) {
+            input?.setAttribute("directory", "true");
             input?.setAttribute("webkitdirectory", "true");
         } else {
+            input?.removeAttribute("directory");
             input?.removeAttribute("webkitdirectory");
         }
-    }, [ref, webkitdirectory, propRef]);
+    }, [ref, directory, propRef]);
 
     return (
         <input {...props} ref={propRef ?? ref} type="file">

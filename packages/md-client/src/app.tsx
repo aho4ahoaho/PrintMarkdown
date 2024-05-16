@@ -23,7 +23,7 @@ export function App() {
         return window.innerWidth > docsWidth * 2;
     }, []);
 
-    const onSelectFile = async (files: File[]) => {
+    const onSelectDirectory = async (files: File[]) => {
         if (pdfUrl) {
             PdfUrl(null);
             URL.revokeObjectURL(pdfUrl);
@@ -84,19 +84,20 @@ export function App() {
                     loading={isConverting}
                     fullWidth
                 >
-                    {file || "Select file"}
+                    Select Directory
                     <VisuallyHiddenInput
                         type="file"
                         onChange={(e) => {
                             const files = e.currentTarget.files;
                             if (files?.length) {
-                                onSelectFile(Array.from(files));
+                                onSelectDirectory(Array.from(files));
                                 e.currentTarget.value = "";
                             }
                         }}
-                        webkitdirectory={true}
+                        directory={true}
                     />
                 </LoadingButton>
+
                 <Button disabled={!pdfUrl} onClick={onDownload} startIcon={<Download />} fullWidth>
                     Download
                 </Button>
