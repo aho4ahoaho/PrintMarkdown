@@ -86,7 +86,7 @@ export const PDFViewer = ({
         if (isDoublePage) {
             renderPage(secondCanvasRef.current, page + 1);
         }
-    }, [pdf, page]);
+    }, [pdf, page, isDoublePage]);
 
     const pageUpdate = useCallback(
         (page: number) => {
