@@ -12,16 +12,12 @@ type PDFViewerProps = {
     className?: string;
     isDoublePage?: boolean;
 };
-export const PDFViewer = ({
-    src,
-    scale = 1.0,
-    className,
-    isDoublePage = false,
-}: PDFViewerProps) => {
+export const PDFViewer = ({ src, className, isDoublePage = false }: PDFViewerProps) => {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const secondCanvasRef = useRef<HTMLCanvasElement>(null);
     const [pdf, setPdf] = useState<PDFDocumentProxy | null>(null);
     const [page, setPage] = useState<number>(1);
+    const [scale, setScale] = useState<number>(devicePixelRatio);
 
     useEffect(() => {
         if (!src) {
@@ -38,6 +34,7 @@ export const PDFViewer = ({
         };
     }, [src]);
 
+    //初期化処理
     useEffect(() => {
         const canvas = canvasRef.current;
         if (!canvas) return;
@@ -49,6 +46,17 @@ export const PDFViewer = ({
         if (!canvas2) return;
         canvas2.width = canvas.width;
         canvas2.height = canvas.height;
+
+        const updatePixelRatio = () => {
+            const pr = window.devicePixelRatio;
+            setScale(pr);
+            console.log(pr);
+            matchMedia(`(resolution: ${pr}dppx)`).addEventListener("change", updatePixelRatio, {
+                once: true,
+            });
+        };
+
+        updatePixelRatio();
     }, [isDoublePage]);
 
     const renderPage = useCallback(
@@ -67,10 +75,7 @@ export const PDFViewer = ({
             //レンダリング処理
             const pageData = await pdf?.getPage(page);
 
-            const docWidth = pageData?.view[2];
-            const docScale = canvas.clientWidth / docWidth;
-
-            const viewport = pageData?.getViewport({ scale: scale * docScale });
+            const viewport = pageData?.getViewport({ scale: scale });
             canvas.width = viewport.width;
             canvas.height = viewport.height;
             pageData?.render({
@@ -86,7 +91,7 @@ export const PDFViewer = ({
         if (isDoublePage) {
             renderPage(secondCanvasRef.current, page + 1);
         }
-    }, [pdf, page, isDoublePage]);
+    }, [pdf, page, scale, isDoublePage]);
 
     const pageUpdate = useCallback(
         (page: number) => {
@@ -110,8 +115,14 @@ export const PDFViewer = ({
     return (
         <PDFViewerContainer className={className}>
             <CanvasGroup>
-                <PDFViewerCanvas ref={canvasRef} />
-                {isDoublePage && <PDFViewerCanvas ref={secondCanvasRef} />}
+                <CanvasWrapper>
+                    <PDFViewerCanvas ref={canvasRef} />
+                </CanvasWrapper>
+                {isDoublePage && (
+                    <CanvasWrapper>
+                        <PDFViewerCanvas ref={secondCanvasRef} />
+                    </CanvasWrapper>
+                )}
             </CanvasGroup>
             <ButtonGroup>
                 <Button
@@ -151,6 +162,10 @@ const CanvasGroup = styled.div({
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
+});
+
+const CanvasWrapper = styled.div({
+    flex: 1,
 });
 
 const PDFViewerCanvas = styled.canvas(({ hidden }: { hidden?: boolean }) => ({
