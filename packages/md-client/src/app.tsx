@@ -4,79 +4,53 @@ import { LoadingButton } from "@mui/lab";
 import styled from "@emotion/styled";
 import { CloudUpload, Download } from "@mui/icons-material";
 import { useCallback, useState } from "preact/hooks";
-import { API_URL } from "./utils/url";
 import { Header } from "./components/Header";
 import { ErrorModal } from "./components/Modal/error";
 import { PDFViewer } from "./components/PDFViewer";
 import { useOnResize } from "./utils/resize";
 import { DirectoryInput } from "./components/DirectoryInput";
-
-const IMAGE_EXTENSIONS = ["jpg", "jpeg", "png", "gif", "bmp", "webp", "svg"];
+import { fileUploadProcess } from "./utils/upload";
+import { convertProcess } from "./utils/convert";
 
 export function App() {
-    const [file, setFile] = useState<File | null>(null);
+    const [file, setFile] = useState<string | null>(null);
     const [isConverting, setIsConverting] = useState<boolean>(false);
     const [errorText, setErrorText] = useState<string | null>(null);
-    const [pdfurl, setPdfUrl] = useState<string | null>(null);
+    const [pdfUrl, PdfUrl] = useState<string | null>(null);
 
     const isDoublePage = useOnResize(() => {
         const docsWidth = (window.innerHeight / 297) * 210;
         return window.innerWidth > docsWidth * 2;
     }, []);
 
-    const onSelectFile = useCallback(
-        (files: File[]) => {
-            const imageFiles = files.filter((file) =>
-                IMAGE_EXTENSIONS.some((ext) => file.name.endsWith(`.${ext}`))
-            );
-            const docFile =
-                files.find((file) => file.name === "index.md") ??
-                files.find((file) => file.name.endsWith(".md"));
-            if (!docFile) {
-                setErrorText("index.md または .md ファイルが見つかりません");
-                return;
-            }
-            setFile(docFile);
-            setIsConverting(true);
-            (async () => {
-                const formData = new FormData();
-                formData.append("file", docFile);
-                imageFiles.forEach((file) => {
-                    formData.append("images", file);
-                });
-                const res = await fetch(`${API_URL}/api/convert`, {
-                    method: "POST",
-                    body: formData,
-                });
-                if (!res.ok) {
-                    console.error(res.statusText);
-                    return;
-                }
-                const blob = await res.blob();
-                const url = URL.createObjectURL(blob);
-                setPdfUrl(url);
-                setIsConverting(false);
-            })();
-            return () => {
-                if (pdfurl) {
-                    URL.revokeObjectURL(pdfurl);
-                }
-            };
-        },
-        [file]
-    );
+    const onSelectFile = async (files: File[]) => {
+        if (pdfUrl) {
+            PdfUrl(null);
+            URL.revokeObjectURL(pdfUrl);
+        }
+        setIsConverting(true);
+        const {
+            doc: { fileName: docFileName, originalName: docOriginalName },
+            images,
+        } = await fileUploadProcess(files);
+        setFile(docOriginalName);
+        const pdfBlob = await convertProcess(docFileName, images);
+        const newPdfUrl = URL.createObjectURL(pdfBlob);
+        PdfUrl(newPdfUrl);
+        setIsConverting(false);
+    };
 
     const onDownload = useCallback(() => {
-        if (!pdfurl) {
+        if (!pdfUrl) {
             return;
         }
         const a = document.createElement("a");
-        a.href = pdfurl;
-        const filename = file?.name.split(".") ?? ["output", "md"];
+        a.href = pdfUrl;
+        const filename = file?.split(".") ?? ["output", "md"];
         filename?.pop();
         a.download = filename?.join(".") + ".pdf";
         a.click();
-    }, [pdfurl]);
+    }, [pdfUrl]);
 
     return (
         <>
@@ -90,7 +64,7 @@ export function App() {
                 padding="0 1rem"
                 boxSizing="border-box"
             >
-                <ThePDFViewer src={pdfurl} isDoublePage={isDoublePage} />
+                <ThePDFViewer src={pdfUrl} isDoublePage={isDoublePage} />
             </Box>
             <Box
                 display="flex"
@@ -110,19 +84,20 @@ export function App() {
                     loading={isConverting}
                     fullWidth
                 >
-                    {file?.name || "Select file"}
+                    {file || "Select file"}
                     <VisuallyHiddenInput
                         type="file"
                         onChange={(e) => {
                             const files = e.currentTarget.files;
                             if (files?.length) {
                                 onSelectFile(Array.from(files));
+                                e.currentTarget.value = "";
                             }
                         }}
                         webkitdirectory={true}
                     />
                 </LoadingButton>
-                <Button disabled={!pdfurl} onClick={onDownload} startIcon={<Download />} fullWidth>
+                <Button disabled={!pdfUrl} onClick={onDownload} startIcon={<Download />} fullWidth>
                     Download
                 </Button>
             </Box>
