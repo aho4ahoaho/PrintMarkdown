@@ -43,3 +43,11 @@ md.use(markdownitcontainer, "info")
 export const convertMarkdownToHTML = async (markdown: string) => {
     return md.render(markdown);
 };
+
+/*export const replaceMarkdownImage = async (markdown: string, images: { originalPath: string, fileName: string }[]) => {
+    return images.reduce((prev, { originalPath, fileName }) => {
+        const pattern = new RegExp(`\\(\\s*(\./)?${originalPath}\\s*\\)`, "g")
+        const address = `(http://localhost:${PORT}/image/${fileName})`;
+        return prev.replaceAll(pattern, address);
+    }, markdown);
+};*/

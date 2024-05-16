@@ -2,65 +2,64 @@ import { Box, Button } from "@mui/material";
 import "./app.css";
 import { LoadingButton } from "@mui/lab";
 import styled from "@emotion/styled";
-import { CloudUpload, Download } from "@mui/icons-material";
+import { CloudUpload, Download, DriveFolderUpload } from "@mui/icons-material";
 import { useCallback, useState } from "preact/hooks";
-import { API_URL } from "./utils/url";
 import { Header } from "./components/Header";
 import { ErrorModal } from "./components/Modal/error";
 import { PDFViewer } from "./components/PDFViewer";
-import { useEffect } from "react";
 import { useOnResize } from "./utils/resize";
+import { DirectoryInput } from "./components/DirectoryInput";
+import { fileUploadProcess } from "./utils/upload";
+import { convertProcess } from "./utils/convert";
+import { TargetedEvent } from "preact/compat";
 
 export function App() {
-    const [file, setFile] = useState<File | null>(null);
+    const [file, setFile] = useState<string | null>(null);
     const [isConverting, setIsConverting] = useState<boolean>(false);
     const [errorText, setErrorText] = useState<string | null>(null);
-    const [pdfurl, setPdfUrl] = useState<string | null>(null);
+    const [pdfUrl, PdfUrl] = useState<string | null>(null);
 
     const isDoublePage = useOnResize(() => {
         const docsWidth = (window.innerHeight / 297) * 210;
         return window.innerWidth > docsWidth * 2;
     }, []);
 
-    useEffect(() => {
-        if (!file) {
-            return;
+    const onInputChange = async (e: TargetedEvent<HTMLInputElement, Event>) => {
+        const files = e.currentTarget.files;
+        if (files?.length) {
+            onSelectDirectory(Array.from(files));
+            e.currentTarget.value = "";
+        }
+    };
+
+    const onSelectDirectory = async (files: File[]) => {
+        if (pdfUrl) {
+            PdfUrl(null);
+            URL.revokeObjectURL(pdfUrl);
         }
         setIsConverting(true);
-        (async () => {
-            const formData = new FormData();
-            formData.append("file", file);
-            const res = await fetch(`${API_URL}/api/convert`, {
-                method: "POST",
-                body: formData,
-            });
-            if (!res.ok) {
-                console.error(res.statusText);
-                return;
-            }
-            const blob = await res.blob();
-            const url = URL.createObjectURL(blob);
-            setPdfUrl(url);
-            setIsConverting(false);
-        })();
-        return () => {
-            if (pdfurl) {
-                URL.revokeObjectURL(pdfurl);
-            }
-        };
-    }, [file]);
+        const {
+            doc: { fileName: docFileName, originalName: docOriginalName },
+            images,
+        } = await fileUploadProcess(files);
+        setFile(docOriginalName);
+        const pdfBlob = await convertProcess(docFileName, images);
+        const newPdfUrl = URL.createObjectURL(pdfBlob);
+        PdfUrl(newPdfUrl);
+        setIsConverting(false);
+    };
 
     const onDownload = useCallback(() => {
-        if (!pdfurl) {
+        if (!pdfUrl) {
             return;
         }
         const a = document.createElement("a");
-        a.href = pdfurl;
-        const filename = file?.name.split(".") ?? ["output", "md"];
+        a.href = pdfUrl;
+        const filename = file?.split(".") ?? ["output", "md"];
         filename?.pop();
         a.download = filename?.join(".") + ".pdf";
         a.click();
-    }, [pdfurl]);
+    }, [pdfUrl]);
 
     return (
         <>
@@ -74,7 +73,7 @@ export function App() {
                 padding="0 1rem"
                 boxSizing="border-box"
             >
-                <ThePDFViewer src={pdfurl} isDoublePage={isDoublePage} />
+                <ThePDFViewer src={pdfUrl} isDoublePage={isDoublePage} />
             </Box>
             <Box
                 display="flex"
@@ -85,31 +84,41 @@ export function App() {
                 padding="0 1rem"
                 boxSizing="border-box"
             >
-                <LoadingButton
-                    component="label"
-                    role={undefined}
-                    variant="contained"
-                    tabIndex={-1}
-                    startIcon={<CloudUpload />}
-                    loading={isConverting}
-                    fullWidth
-                >
-                    {file?.name || "Select file"}
-                    <VisuallyHiddenInput
-                        type="file"
-                        onChange={(e) => {
-                            const file = e.target.files?.item(0);
-                            if (!file) {
-                                return;
-                            } else if (file?.name.endsWith(".md")) {
-                                setFile(file);
-                            } else {
-                                setErrorText("マークダウンファイルを選択してください。");
-                            }
-                        }}
-                    />
-                </LoadingButton>
-                <Button disabled={!pdfurl} onClick={onDownload} startIcon={<Download />} fullWidth>
+                <ButtonGroupWrapper>
+                    <LoadingButton
+                        component="label"
+                        role={undefined}
+                        variant="contained"
+                        tabIndex={-1}
+                        startIcon={<CloudUpload />}
+                        loading={isConverting}
+                    >
+                        Select File
+                        <VisuallyHiddenInput
+                            type="file"
+                            onChange={onInputChange}
+                            directory={false}
+                            accept={".md"}
+                        />
+                    </LoadingButton>
+                    <LoadingButton
+                        component="label"
+                        role={undefined}
+                        variant="contained"
+                        tabIndex={-1}
+                        startIcon={<DriveFolderUpload />}
+                        loading={isConverting}
+                        color="secondary"
+                    >
+                        Select Folder
+                        <VisuallyHiddenInput
+                            type="file"
+                            onChange={onInputChange}
+                            directory={true}
+                        />
+                    </LoadingButton>
+                </ButtonGroupWrapper>
+                <Button disabled={!pdfUrl} onClick={onDownload} startIcon={<Download />} fullWidth>
                     Download
                 </Button>
             </Box>
@@ -127,7 +136,18 @@ export function App() {
     );
 }
 
-const VisuallyHiddenInput = styled.input({
+const ButtonGroupWrapper = styled.div({
+    display: "flex",
+    flexDirection: "row",
+    gap: "1rem",
+    width: "100%",
+    maxWidth: "600px",
+    "> *": {
+        flex: 1,
+    },
+});
+
+const VisuallyHiddenInput = styled(DirectoryInput)({
     clip: "rect(0 0 0 0)",
     height: 1,
     overflow: "hidden",
