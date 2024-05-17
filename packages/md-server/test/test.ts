@@ -1,6 +1,7 @@
 import { convertMarkdownToPdf } from "../src/convert";
 import path from "path";
 import fs from "fs";
+
 const convert = async (relativePath: string) => {
     const mdPath = path.resolve(__dirname, relativePath);
     const pdfPath = await convertMarkdownToPdf(mdPath);
@@ -11,7 +12,9 @@ const convert = async (relativePath: string) => {
     //元のHTMLファイルもコピー
     const htmlPath = path.join(path.dirname(pdfPath), `${filename}.html`);
     console.log(htmlPath);
-    fs.copyFileSync(htmlPath, path.resolve(__dirname, `${filename}.html`));
+    if (fs.existsSync(htmlPath)) {
+        fs.copyFileSync(htmlPath, path.resolve(__dirname, `${filename}.html`));
+    }
 };
 
 convert("example.md");
