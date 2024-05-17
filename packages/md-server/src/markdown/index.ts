@@ -2,13 +2,7 @@ import markdownit from "markdown-it";
 import hljs from "highlight.js";
 
 //型の怪しいプラグインを読み込む
-import {
-    markdownitsub,
-    markdownitsup,
-    markdownitcheckbox,
-    markdownitcontainer,
-    markdownitfootnote,
-} from "./plugin";
+import { markdownitcheckbox, markdownitcontainer, markdownitfootnote } from "./plugin";
 import type MarkdownIt from "markdown-it/index.js";
 
 //any型を避けるために型を指定
@@ -33,12 +27,15 @@ const md: MarkdownIt = markdownit({
     },
 });
 //プラグインを適用
-md.use(markdownitsub).use(markdownitsup).use(markdownitcheckbox).use(markdownitfootnote);
+//md.use(markdownitsub).use(markdownitsup).use(markdownitcheckbox).use(markdownitfootnote);
+md.use(markdownitcheckbox).use(markdownitfootnote); //MathJaxとの競合を避けるため、一部のプラグインを適用しない
 
 //コンテナプラグインを適用
 md.use(markdownitcontainer, "info")
     .use(markdownitcontainer, "warn")
     .use(markdownitcontainer, "alert");
+
+md.disable("emphasis"); //MathJaxとの競合を避けるため、強調を無効化
 
 export const convertMarkdownToHTML = async (markdown: string) => {
     return md.render(markdown);
