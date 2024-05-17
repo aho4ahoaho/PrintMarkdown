@@ -139,6 +139,7 @@ router.post("/convert", async (req, res) => {
             const imagePath = path.join(rootDir, "tmp", image.fileName);
             (await fs.exists(imagePath)) && fs.unlink(imagePath);
         });
+        (await fs.exists(pdfPath)) && fs.unlink(pdfPath);
     });
 });
 
