@@ -7,13 +7,7 @@ const app = Express();
 //PDF生成用に画像を配信する
 app.use(
     "/image",
-    (req, res, next) => {
-        if (req.ip !== "::1") {
-            res.status(403).send("Forbidden");
-            return;
-        }
-        next();
-    },
+
     Express.static(path.join(__dirname, "tmp"))
 );
 
