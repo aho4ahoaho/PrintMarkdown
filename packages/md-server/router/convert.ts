@@ -85,12 +85,15 @@ router.post(
             })),
         });
 
-        setTimeout(async () => {
-            (await fs.exists(docFile.path)) && fs.unlink(docFile.path);
-            images?.forEach(
-                async (image) => (await fs.exists(docFile.path)) && fs.unlink(image.path)
-            );
-        }, 1000 * 10);
+        setTimeout(
+            async () => {
+                (await fs.exists(docFile.path)) && fs.unlink(docFile.path);
+                images?.forEach(
+                    async (image) => (await fs.exists(image.path)) && fs.unlink(image.path)
+                );
+            },
+            1000 * 60 * 5
+        );
     }
 );
 
@@ -130,10 +133,12 @@ router.post("/convert", async (req, res) => {
     })();
     const docPath = path.join(rootDir, "tmp", docFile);
     const pdfPath = await convertMarkdownToPdf(docPath, images);
-    res.sendFile(pdfPath, () => {
-        fs.unlink(docPath);
-        images.forEach((image) => fs.unlink(path.join(rootDir, "tmp", image.fileName)));
-        fs.unlink(pdfPath);
+    res.sendFile(pdfPath, async () => {
+        (await fs.exists(docPath)) && fs.unlink(docPath);
+        images?.forEach(async (image) => {
+            const imagePath = path.join(rootDir, "tmp", image.fileName);
+            (await fs.exists(imagePath)) && fs.unlink(imagePath);
+        });
     });
 });
 
