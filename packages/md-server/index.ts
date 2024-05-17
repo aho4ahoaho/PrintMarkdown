@@ -5,11 +5,7 @@ import { router as convertRouter } from "./router/convert";
 const app = Express();
 
 //PDF生成用に画像を配信する
-app.use(
-    "/image",
-
-    Express.static(path.join(__dirname, "tmp"))
-);
+app.use("/image", Express.static(path.join(__dirname, "tmp")));
 
 //アクセスを表示する
 app.use((req, res, next) => {
