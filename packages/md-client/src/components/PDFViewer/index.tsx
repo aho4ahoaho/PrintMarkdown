@@ -106,6 +106,13 @@ export const PDFViewer = ({ src, className, isDoublePage = false }: PDFViewerPro
                 if (next > pdf.numPages) {
                     return pdf.numPages;
                 }
+                if (isDoublePage && next % 2 === 0) {
+                    if (page > 0) {
+                        return next - 1;
+                    } else {
+                        return next + 1;
+                    }
+                }
                 return next;
             });
         },
