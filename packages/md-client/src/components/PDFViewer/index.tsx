@@ -128,7 +128,11 @@ export const PDFViewer = ({ src, className, isDoublePage = false }: PDFViewerPro
                 <Button
                     variant="contained"
                     onClick={() => {
-                        pageUpdate(-1);
+                        if (isDoublePage) {
+                            pageUpdate(-2);
+                        } else {
+                            pageUpdate(-1);
+                        }
                     }}
                 >
                     Prev
@@ -139,7 +143,11 @@ export const PDFViewer = ({ src, className, isDoublePage = false }: PDFViewerPro
                 <Button
                     variant="contained"
                     onClick={() => {
-                        pageUpdate(1);
+                        if (isDoublePage) {
+                            pageUpdate(2);
+                        } else {
+                            pageUpdate(1);
+                        }
                     }}
                 >
                     Next
