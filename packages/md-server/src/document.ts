@@ -23,3 +23,12 @@ export const replaceHTMLImage = async (
     await Promise.all(imgElms.map(replaceImage));
     return document.documentElement.outerHTML;
 };
+
+export const removeScriptTag = async (html: string) => {
+    const window = new Window();
+    window.document.body.outerHTML = html;
+    const document = window.document;
+    const scriptElms = Array.from(document.querySelectorAll("script"));
+    scriptElms.forEach((scriptElm) => scriptElm.remove());
+    return document.documentElement.outerHTML;
+};

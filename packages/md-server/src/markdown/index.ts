@@ -7,6 +7,7 @@ import type MarkdownIt from "markdown-it/index.js";
 
 //any型を避けるために型を指定
 const md: MarkdownIt = markdownit({
+    html: true,
     highlight: (str, lang) => {
         if (lang && hljs.getLanguage(lang)) {
             try {
